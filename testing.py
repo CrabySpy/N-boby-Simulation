@@ -12,8 +12,7 @@ def test_get_pos_zero_acceleration():
 
     result = get_pos(current_pos, previous_pos, acceleration, dt)
 
-    # Expected: x_next = 2*x_current - x_previous
-    expected = 2 * current_pos - previous_pos
+    expected = 15.0
 
     assert result == expected
 
@@ -29,8 +28,8 @@ def test_get_pos_constant_acceleration():
 
     result = get_pos(current_pos, previous_pos, acceleration, dt)
 
-    expected = 2 * current_pos - previous_pos + acceleration * dt**2
-
+    expected = 13.0
+ 
     assert result == expected
 
 if __name__ == "__main__":

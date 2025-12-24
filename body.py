@@ -1,72 +1,74 @@
 import pygame
-import math
-from scipy.constants import G
+from pygame import Vector2
 # import 
 
 class Body(pygame.sprite.Sprite):
-    def __init__(self, pos: tuple, mass:float, velocity: tuple, acceleration: tuple, body_group, dt) -> None:
+    def __init__(self, pos: tuple, mass:float, velocity: tuple, acceleration: tuple, radius: int, dt: float, body_group) -> None:
         super().__init__()
-        self.pos = pygame.math.Vector2(pos)
-
-        self.x_current_pos = self.pos[0]
-        self.y_current_pos = self.pos[1]
-
-        self.x_v = velocity[0]
-        self.y_v = velocity[1]
-
-        self.x_previous_pos = self.x_current_pos - self.x_v * dt
-        self.y_previous_pos = self.y_current_pos - self.y_v * dt
-
-        self.x_a = acceleration[0]
-        self.y_a = acceleration[1]
-        
+        self.pos = Vector2(pos)
         self.mass = mass
         self.body_group = body_group
         self.dt = dt
+        self.radius = radius
 
-        print(self.pos)
+        self.current_pos = Vector2(pos)
+
+        self.previous_pos = self.current_pos - Vector2(velocity) * dt
+
+        self.acceleration = Vector2(acceleration)
         
     def draw(self, screen):
-        self.rect = pygame.Rect(self.x_current_pos, self.y_current_pos, 10, 10)
-        pygame.draw.rect(screen, "red", self.rect)
+        pygame.draw.circle(screen, "white", self.current_pos, self.radius)
     
     def update(self):
-        # Reset acceleration
-        self.x_a = 0
-        self.y_a = 0
         # Update acceleration
-        for body in self.body_group:
-            if body != self:
-                # Calculate distance
-                distance = self.pos.distance_to(body.pos)
-                dx = body.x_current_pos - self.x_current_pos
-                dy = body.y_current_pos - self.y_current_pos
+        self.acceleration = get_grav_acc(self, self.body_group)
+
+        # Update next position
+        self.next_pos = get_pos(self.current_pos, self.previous_pos, self.acceleration, self.dt)
+
+        # Update previous and current positions
+        self.previous_pos = self.current_pos
+        self.current_pos = self.next_pos
+
+        # Check collision:
+        # for other in self.body_group:
+        #     if other != self and check_collision(self, other):
+        #         pygame.sprite.Sprite.kill(self)
+        #         pygame.sprite.Sprite.kill(other)
                 
-                # Calculate acceleration
-                acceleration = (1000 * body.mass) / (distance**2)
-                self.x_a += acceleration * (dx / distance)
-                self.y_a += acceleration * (dy / distance)
-                # print(self.x_a)
-
-
-        # # Update velocity
-        # self.x_v += self.x_a * dt
-        # self.y_v += self.y_a * dt
-
-        # Update position
-        self.x_next_pos = get_pos(self.x_current_pos, self.x_previous_pos, self.x_a, self.dt)
-        self.y_next_pos = get_pos(self.y_current_pos, self.y_previous_pos, self.y_a, self.dt)
-
-        self.x_previous_pos = self.x_current_pos
-        self.y_previous_pos = self.y_current_pos
-
-        self.x_current_pos = self.x_next_pos
-        self.y_current_pos = self.y_next_pos
-        # if self.y >= 600:
-        #     self.kill()
 
 # Helper function
-def get_pos(current_pos, previous_pos, acceleration, dt):
+def get_grav_acc(self, body_group) -> Vector2:
+    """Compute total gravitational acceleration on a body."""
+    total_acc = Vector2(0, 0)
+    # Calculate gravitational acceleration from other bodies
+    for body in body_group:
+        if body != self:
+            # Calculate distance
+            dx = body.current_pos.x - self.current_pos.x
+            dy = body.current_pos.y - self.current_pos.y
+            distance = (dx**2 + dy**2) ** 0.5 + 3
+
+            if distance == 0:
+                continue
+            # Calculate acceleration
+            acc = (100 * body.mass) / (distance ** 2)
+            total_acc.x += acc * (dx / distance)
+            total_acc.y += acc * (dy / distance)
+
+    return total_acc
+
+def get_pos(current_pos, previous_pos, acceleration, dt) -> float:
     """Return the next position using Verlet integration."""
-    next_pos = (2 * current_pos) - previous_pos + (acceleration * dt**2)
+    next_pos = (2 * current_pos) - previous_pos + (acceleration * (dt ** 2))
     return next_pos
+
+def check_collision(body_a, body_b) -> bool:
+    """Return True if two circular bodies collide."""
+    dx = body_b.current_pos.x - body_a.current_pos.x
+    dy = body_b.current_pos.y - body_a.current_pos.y
+    distance = (dx**2 + dy**2)
+    radius_sum = body_a.radius + body_b.radius
+
+    return distance <= radius_sum

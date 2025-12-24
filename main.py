@@ -40,10 +40,11 @@ def update(dt):
         spawn_cooldown += dt
         # if spawn_cooldown >= SPAWN_INTERVAL:
         pos = pygame.mouse.get_pos()
-        velocity = (0, 0)
+        velocity = (random.randint(-20,20), random.randint(-20,20))
         acceleration = (0, 0)
         mass = 1000
-        body_group.add(Body(pos, mass, velocity, acceleration, body_group, dt))
+        radius = 10
+        body_group.add(Body(pos, mass, velocity, acceleration, radius, dt, body_group))
         spawn_cooldown = 0
         mouse_held = False
     else:
@@ -53,7 +54,7 @@ def update(dt):
     
 def draw(screen):
     """Draws objects on the screen."""
-    screen.fill((30, 0, 0))
+    screen.fill((0, 0, 0))
 
     for body in body_group:
         body.draw(screen)

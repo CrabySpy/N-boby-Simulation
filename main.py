@@ -43,13 +43,13 @@ def update(dt):
         velocity = (0, 0)
         acceleration = (0, 0)
         mass = 1000
-        body_group.add(Body(pos, mass, velocity, acceleration, body_group))
+        body_group.add(Body(pos, mass, velocity, acceleration, body_group, dt))
         spawn_cooldown = 0
         mouse_held = False
     else:
         spawn_cooldown = 0
     
-    body_group.update(dt)
+    body_group.update()
     
 def draw(screen):
     """Draws objects on the screen."""

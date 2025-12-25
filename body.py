@@ -36,8 +36,7 @@ class Body(pygame.sprite.Sprite):
         #     if other != self and check_collision(self, other):
         #         pygame.sprite.Sprite.kill(self)
         #         pygame.sprite.Sprite.kill(other)
-                
-
+    
 # Helper function
 def get_grav_acc(self, body_group) -> Vector2:
     """Compute total gravitational acceleration on a body."""

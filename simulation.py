@@ -6,7 +6,13 @@ pygame.init()
 pygame.display.set_caption("Simulation")
 #--------------------------
 # Initialize constants
+WIDTH, HEIGHT = 1100, 800
 MENU = "menu"
+PRESET = "preset"
+BASIC = "basic"
+CIRCULAR = "basic"
+ELLIPTICAL = "elliptical"
+GRAV_COLLAPSE = "gravitational collapse"
 SIMULATION = "simulation"
 QUIT = "quit"
 
@@ -25,6 +31,7 @@ spawn_timer = 0
 mouse_held = False
 spawn_cooldown = 0
 SPAWN_INTERVAL = 0.01
+#--------------------------
 
 clock = pygame.time.Clock()
 
@@ -38,12 +45,13 @@ def update(dt):
     if spawn_timer > 1:
         print(body_group)
         spawn_timer = 0
-
+    
+    
     if mouse_held:
         spawn_cooldown += dt
         # if spawn_cooldown >= SPAWN_INTERVAL:
         pos = pygame.mouse.get_pos()
-        velocity = (random.randint(-40,40), random.randint(-40,40))
+        velocity = (1000, 0)
         acceleration = (0, 0)
         mass = 1000
         radius = 10
@@ -65,12 +73,21 @@ def draw(screen):
 def reset_game():
     """Reset the game."""
     body_group.empty()
+    body_group.add(Body((WIDTH//2,HEIGHT//2), 50000, (0,0), (0,0), 40, 0, body_group))
 
 
-def simulation_loop(screen, fps):
+def simulation_loop(screen, sim_type, fps):
     global mouse_held
 
     pygame.display.set_caption("Simulation")
+    if sim_type == BASIC:
+        body_group.add(Body((WIDTH//2,HEIGHT//2), 50000, (0,0), (0,0), 40, 0, body_group))
+    elif sim_type == CIRCULAR:
+        body_group.add(Body((WIDTH//2,HEIGHT//2), 50000, (0,0), (0,0), 40, 0, body_group))
+    elif sim_type == ELLIPTICAL:
+        body_group.add(Body((WIDTH//2,HEIGHT//2), 50000, (0,0), (0,0), 40, 0, body_group))
+    elif sim_type == GRAV_COLLAPSE:
+        body_group.add(Body((WIDTH//2,HEIGHT//2), 50000, (0,0), (0,0), 40, 0, body_group))
 
     # Game loop.
     while True:

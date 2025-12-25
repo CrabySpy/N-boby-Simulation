@@ -5,8 +5,15 @@ pygame.init()
 #--------------------------
 # Initialize constants
 WIDTH, HEIGHT = 1100, 800
-BUTTON_W, BUTTON_H = 300, 70
+M_BUTTON_W, M_BUTTON_H = 300, 70 # Main menu button
+P_BUTTON_W, P_BUTTON_H = 200, 200 # Preset button
+SPACING = 40
 MENU = "menu"
+PRESET = "preset"
+BASIC = "basic"
+CIRCULAR = "basic"
+ELLIPTICAL = "elliptical"
+GRAV_COLLAPSE = "gravitational collapse"
 SIMULATION = "simulation"
 QUIT = "quit"
 
@@ -16,32 +23,31 @@ clock = pygame.time.Clock()
 def get_font(size):
     """Return font with the given size."""
     return pygame.font.Font("assets/font/main_menu_font.otf", size)
-def menu_loop(screen, fps):
+def main_menu_loop(screen, fps):
+
     pygame.display.set_caption("Main Menu")
     
-
     menu_title = get_font(100).render("N-Body Simulation", True, "white")
     menu_tit_rect = menu_title.get_rect(center=(WIDTH / 2, 200))
 
-    # start_button = Button("Start Simulation", (WIDTH // 2 + 300, 250), (300, 60), font)
-    # quit_button = Button("Quit", (300, 350), (300, 60), font)
     button_font = get_font(30)
+
     start_button = Button(
         "Start Simulation",
-        (WIDTH // 2 - BUTTON_W // 2, HEIGHT // 2 + BUTTON_H // 2),
-        (BUTTON_W, BUTTON_H),
+        (WIDTH // 2 - M_BUTTON_W // 2, HEIGHT // 2 + M_BUTTON_H // 2),
+        (M_BUTTON_W, M_BUTTON_H),
         button_font
     )
     preset_button = Button(
         "Presets",
-        (WIDTH // 2 - BUTTON_W // 2, (HEIGHT // 2 + BUTTON_H // 2) + 100),
-        (BUTTON_W, BUTTON_H),
+        (WIDTH // 2 - M_BUTTON_W // 2, (HEIGHT // 2 + M_BUTTON_H // 2) + 100),
+        (M_BUTTON_W, M_BUTTON_H),
         button_font
     )
     quit_button = Button(
         "Quit",
-        (WIDTH // 2 - BUTTON_W // 2, (HEIGHT // 2 + BUTTON_H // 2) + 200),
-        (BUTTON_W, BUTTON_H),
+        (WIDTH // 2 - M_BUTTON_W // 2, (HEIGHT // 2 + M_BUTTON_H // 2) + 200),
+        (M_BUTTON_W, M_BUTTON_H),
         button_font
     )
 
@@ -53,7 +59,7 @@ def menu_loop(screen, fps):
                 if start_button.is_clicked(event):
                     return SIMULATION
                 if preset_button.is_clicked(event):
-                    print("preset is clicked")
+                    return PRESET
                 if quit_button.is_clicked(event):
                     return QUIT
 
@@ -64,6 +70,64 @@ def menu_loop(screen, fps):
         quit_button.draw(screen)
 
         screen.blit(menu_title, menu_tit_rect)
+
+        pygame.display.flip()
+        clock.tick(fps)
+
+def preset_loop(screen, fps):
+    pygame.display.set_caption("Preset Menu")
+
+    menu_title = get_font(100).render("Preset", True, "white")
+    menu_title_rect = menu_title.get_rect(center=(WIDTH // 2, 200))
+
+    button_font = get_font(30)
+
+    # Total width of button row
+    total_width = 3 * P_BUTTON_W + 2 * SPACING
+    start_x = WIDTH // 2 - total_width // 2
+    y_pos = HEIGHT // 2
+
+    circ_button = Button(
+        "Two-Body:\nCircular Orbit",
+        (start_x, y_pos),
+        (P_BUTTON_W, P_BUTTON_H),
+        button_font
+    )
+
+    ellip_button = Button(
+        "Two-Body:\nElliptical Orbit",
+        (start_x + P_BUTTON_W + SPACING, y_pos),
+        (P_BUTTON_W, P_BUTTON_H),
+        button_font
+    )
+
+    grav_button = Button(
+        "Gravitational\nCollapse",
+        (start_x + 2 * (P_BUTTON_W + SPACING), y_pos),
+        (P_BUTTON_W, P_BUTTON_H),
+        button_font
+    )
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return QUIT
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if circ_button.is_clicked(event):
+                    return CIRCULAR
+                if ellip_button.is_clicked(event):
+                    return ELLIPTICAL
+                if grav_button.is_clicked(event):
+                    return GRAV_COLLAPSE
+
+        screen.fill((0, 0, 0))
+
+        screen.blit(menu_title, menu_title_rect)
+
+        circ_button.draw(screen)
+        ellip_button.draw(screen)
+        grav_button.draw(screen)
 
         pygame.display.flip()
         clock.tick(fps)

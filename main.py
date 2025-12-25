@@ -18,7 +18,7 @@ clock = pygame.time.Clock()
 screen = pygame.display.set_mode((DIMENSIONS))
 
 def main():
-    state = SIMULATION
+    state = MENU
     running = True
     while running:
         if state == MENU:

@@ -43,7 +43,7 @@ def update(dt):
         spawn_cooldown += dt
         # if spawn_cooldown >= SPAWN_INTERVAL:
         pos = pygame.mouse.get_pos()
-        velocity = (random.randint(-20,20), random.randint(-20,20))
+        velocity = (random.randint(-40,40), random.randint(-40,40))
         acceleration = (0, 0)
         mass = 1000
         radius = 10

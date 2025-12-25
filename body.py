@@ -48,12 +48,12 @@ def get_grav_acc(self, body_group) -> Vector2:
             # Calculate distance
             dx = body.current_pos.x - self.current_pos.x
             dy = body.current_pos.y - self.current_pos.y
-            distance = (dx**2 + dy**2) ** 0.5 + 3
+            distance = (dx**2 + dy**2) ** 0.5 + 100
 
             if distance == 0:
                 continue
             # Calculate acceleration
-            acc = (100 * body.mass) / (distance ** 2)
+            acc = (10000 * body.mass) / (distance ** 2)
             total_acc.x += acc * (dx / distance)
             total_acc.y += acc * (dy / distance)
 

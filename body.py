@@ -1,15 +1,17 @@
 import pygame
 from pygame import Vector2
-# import 
+
 
 class Body(pygame.sprite.Sprite):
-    def __init__(self, pos: tuple, mass:float, velocity: tuple, acceleration: tuple, radius: int, dt: float, body_group) -> None:
+    def __init__(self, pos: tuple, mass:float, velocity: tuple, acceleration: tuple, radius: int, dt: float, is_star: bool, body_group) -> None:
         super().__init__()
         self.pos = Vector2(pos)
         self.mass = mass
         self.body_group = body_group
         self.dt = dt
         self.radius = radius
+
+        self.is_star = is_star
 
         self.current_pos = Vector2(pos)
 
@@ -32,14 +34,23 @@ class Body(pygame.sprite.Sprite):
         self.current_pos = self.next_pos
 
         # Check collision:
-        # for other in self.body_group:
-        #     if other != self and check_collision(self, other):
-        #         pygame.sprite.Sprite.kill(self)
-        #         pygame.sprite.Sprite.kill(other)
+        for other in self.body_group:
+            if other != self and check_collision(self, other):
+                if self.is_star:
+                    other.kill()
+                elif other.is_star:
+                    self.kill()
+                else:
+                    self.kill()
+                    other.kill()
+
+
     
 # Helper function
 def get_grav_acc(self, body_group) -> Vector2:
     """Compute total gravitational acceleration on a body."""
+    G = 100 # Gravitational constant (scaled)
+    SOFTENING = 5 # Avoids infinite forces
     total_acc = Vector2(0, 0)
     # Calculate gravitational acceleration from other bodies
     for body in body_group:
@@ -47,18 +58,18 @@ def get_grav_acc(self, body_group) -> Vector2:
             # Calculate distance
             dx = body.current_pos.x - self.current_pos.x
             dy = body.current_pos.y - self.current_pos.y
-            distance = (dx**2 + dy**2) ** 0.5 + 100
+            distance = (dx**2 + dy**2 + SOFTENING**2) ** 0.5
 
             if distance == 0:
                 continue
             # Calculate acceleration
-            acc = (10000 * body.mass) / (distance ** 2)
+            acc = (G * body.mass) / (distance ** 2)
             total_acc.x += acc * (dx / distance)
             total_acc.y += acc * (dy / distance)
 
     return total_acc
 
-def get_pos(current_pos, previous_pos, acceleration, dt) -> float:
+def get_pos(current_pos, previous_pos, acceleration, dt) -> Vector2:
     """Return the next position using Verlet integration."""
     next_pos = (2 * current_pos) - previous_pos + (acceleration * (dt ** 2))
     return next_pos
@@ -70,4 +81,4 @@ def check_collision(body_a, body_b) -> bool:
     distance = (dx**2 + dy**2)
     radius_sum = body_a.radius + body_b.radius
 
-    return distance <= radius_sum
+    return distance <= radius_sum ** 2

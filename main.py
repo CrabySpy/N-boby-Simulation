@@ -7,16 +7,21 @@ pygame.init()
 #--------------------------
 # Initialize constants
 FPS = 60
+
 WIDTH, HEIGHT = 1100, 800
 DIMENSIONS = (WIDTH, HEIGHT)
+
 MENU = "menu"
+PRESET = "preset"
+BACK = "back"
+QUIT = "quit"
+
 BASIC = "basic"
-CIRCULAR = "basic"
+CIRCULAR = "circular"
 ELLIPTICAL = "elliptical"
 GRAV_COLLAPSE = "gravitational collapse"
-PRESET = 'preset'
+
 SIMULATION = "simulation"
-QUIT = "quit"
 #--------------------------
 
 clock = pygame.time.Clock()
@@ -24,20 +29,37 @@ screen = pygame.display.set_mode((DIMENSIONS))
 
 def main():
     state = MENU
+    sim_type = BASIC
+    last_state = state
+    
+
     running = True
-    sim_type = "basic"
     while running:
         if state == MENU:
-            state = main_menu_loop(screen, FPS)        
+            last_state = state
+            state = main_menu_loop(screen, FPS)
+
+        elif state == BACK:
+            state = last_state
+
         elif state == PRESET:
+            last_state = state
             sim_type = preset_loop(screen, FPS)
-            state = simulation_loop(screen, sim_type, FPS)
+
+            if sim_type == QUIT:
+                state = QUIT
+            elif sim_type == BACK:
+                state = MENU
+            else:
+                state = SIMULATION
+
         elif state == SIMULATION:
-            sim_type = "basic"
             state = simulation_loop(screen, sim_type, FPS)
+        
 
         elif state == QUIT:
             running = False
+        
 
         clock.tick(FPS)
 

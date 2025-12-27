@@ -5,17 +5,22 @@ pygame.init()
 #--------------------------
 # Initialize constants
 WIDTH, HEIGHT = 1100, 800
+
 M_BUTTON_W, M_BUTTON_H = 300, 70 # Main menu button
 P_BUTTON_W, P_BUTTON_H = 200, 200 # Preset button
 SPACING = 40
+
 MENU = "menu"
 PRESET = "preset"
+BACK = "back"
+QUIT = "quit"
+
 BASIC = "basic"
-CIRCULAR = "basic"
+CIRCULAR = "circular"
 ELLIPTICAL = "elliptical"
 GRAV_COLLAPSE = "gravitational collapse"
+
 SIMULATION = "simulation"
-QUIT = "quit"
 
 #--------------------------
 
@@ -108,6 +113,13 @@ def preset_loop(screen, fps):
         button_font
     )
 
+    back_button = Button(
+        "Back",
+        (WIDTH // 2 - M_BUTTON_W // 2, y_pos + P_BUTTON_H + 60),
+        (M_BUTTON_W, M_BUTTON_H), 
+        button_font
+    )
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -120,6 +132,8 @@ def preset_loop(screen, fps):
                     return ELLIPTICAL
                 if grav_button.is_clicked(event):
                     return GRAV_COLLAPSE
+                if back_button.is_clicked(event):
+                    return BACK
 
         screen.fill((0, 0, 0))
 
@@ -128,6 +142,7 @@ def preset_loop(screen, fps):
         circ_button.draw(screen)
         ellip_button.draw(screen)
         grav_button.draw(screen)
+        back_button.draw(screen)
 
         pygame.display.flip()
         clock.tick(fps)

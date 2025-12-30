@@ -40,9 +40,7 @@ class Body(pygame.sprite.Sprite):
                     other.kill()
                 elif other.is_star:
                     self.kill()
-                else:
-                    self.kill()
-                    other.kill()
+                
 
 
     

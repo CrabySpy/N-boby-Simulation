@@ -1,6 +1,7 @@
 import pygame
 import random
 from body import Body
+from button import Button
 
 pygame.init()
 pygame.display.set_caption("Simulation")
@@ -20,21 +21,29 @@ GRAV_COLLAPSE = "gravitational collapse"
 
 SIMULATION = "simulation"
 
+P_BUTTON_W = 160
+P_BUTTON_H = 50
+MARGIN = 20
 
 #--------------------------
 # Initialize sprite groups
 body_group = pygame.sprite.Group()
-button_group = pygame.sprite.Group()
+
+#--------------------------
+# Initialize font
+font = pygame.font.Font("assets/font/main_menu_font.otf", 20)
 
 #--------------------------
 
 clock = pygame.time.Clock()
 
 def spawn_preset(sim_type):
+    """Creates body objects according to preset type."""
     body_group.empty()
+    center = (WIDTH//2, HEIGHT//2)
 
     if sim_type == BASIC:
-        pass
+        body_group.add(Body(center, 50000, (0,0), (0,0), 40, 0, True, body_group))
     elif sim_type == CIRCULAR:
         body_group.add(Body((WIDTH//2,HEIGHT//2), 50000, (0,0), (0,0), 40, 0, True, body_group))
     elif sim_type == ELLIPTICAL:
@@ -53,7 +62,7 @@ def draw(screen):
 
     for body in body_group:
         body.draw(screen)
-
+    
 
 
 def simulation_loop(screen, sim_type, fps):
@@ -63,6 +72,13 @@ def simulation_loop(screen, sim_type, fps):
     
     spawn_preset(sim_type)
     
+    back_button = Button(
+    "Back",
+    (MARGIN, HEIGHT - P_BUTTON_H - MARGIN),  
+    (P_BUTTON_W, P_BUTTON_H),
+    font
+    )
+
     # Game loop.
     while True:
         # Event handling
@@ -81,7 +97,10 @@ def simulation_loop(screen, sim_type, fps):
                     
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_held = True
+                if back_button.is_clicked(event):
+                    return BACK
+                else:
+                    mouse_held = True
 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_held = False
@@ -90,7 +109,7 @@ def simulation_loop(screen, sim_type, fps):
                 pos = pygame.mouse.get_pos()
                 velocity = (100, 0)
                 acceleration = (0, 0)
-                mass = 10000
+                mass = 100
                 radius = 10
                 is_star = False
                 body_group.add(Body(pos, mass, velocity, acceleration, radius, dt, is_star, body_group))
@@ -101,6 +120,7 @@ def simulation_loop(screen, sim_type, fps):
         update(dt)
         # Draw.
         draw(screen)
+        back_button.draw(screen)
         
         pygame.display.flip()
         clock.tick(fps)

@@ -56,7 +56,6 @@ def main():
         elif state == SIMULATION:
             state = simulation_loop(screen, sim_type, FPS)
         
-
         elif state == QUIT:
             running = False
         

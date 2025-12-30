@@ -8,6 +8,7 @@ pygame.display.set_caption("Simulation")
 #--------------------------
 # Initialize constants
 WIDTH, HEIGHT = 1100, 800
+FPS = 60
 
 MENU = "menu"
 PRESET = "preset"
@@ -41,16 +42,45 @@ def spawn_preset(sim_type):
     """Creates body objects according to preset type."""
     body_group.empty()
     center = (WIDTH//2, HEIGHT//2)
+    dt = 1 / FPS
 
+    star_mass = 50000
+    planet_mass = 10
+    r = 200
+
+    # Circular orbit velocity
+    v = (100 * star_mass / r) ** 0.5  
     if sim_type == BASIC:
-        body_group.add(Body(center, 50000, (0,0), (0,0), 40, 0, True, body_group))
+        body_group.add(
+            Body(center, star_mass, (0, 0), (0, 0), 40, 0, True, body_group)
+        )
+
     elif sim_type == CIRCULAR:
-        body_group.add(Body((WIDTH//2,HEIGHT//2), 50000, (0,0), (0,0), 40, 0, True, body_group))
+        body_group.add(
+            Body(center, star_mass, (0, 0), (0, 0), 40, 0, True, body_group)
+        )
+        body_group.add(
+            Body(center + pygame.Vector2(r, 0), planet_mass, (0, -v), (0, 0), 6, dt, False, body_group)
+        )
+
     elif sim_type == ELLIPTICAL:
-        body_group.add(Body((WIDTH//2,HEIGHT//2), 50000, (0,0), (0,0), 40, 0, True, body_group))
+        body_group.add(
+            Body(center, star_mass, (0, 0), (0, 0), 40, 0, True, body_group)
+        )
+
+        body_group.add(
+            Body(center + pygame.Vector2(r, 0), planet_mass, (0, -v + 30), (0, 0), 6, dt, False, body_group)
+        )
+
     elif sim_type == GRAV_COLLAPSE:
-        body_group.add(Body((WIDTH//2,HEIGHT//2), 50000, (0,0), (0,0), 40, 0, True, body_group))
-    
+        for _ in range(50):  # ADDED: many-body collapse
+            pos = pygame.Vector2(
+                random.randint(300, 800),
+                random.randint(200, 600)
+            )
+            body_group.add(
+                Body(pos, planet_mass, (0, 0), (0, 0), 6, dt, False, body_group)
+            )
 
 def update(dt):
     """Updates the game once per given time dt."""
@@ -109,8 +139,8 @@ def simulation_loop(screen, sim_type, fps):
                 pos = pygame.mouse.get_pos()
                 velocity = (100, 0)
                 acceleration = (0, 0)
-                mass = 100
-                radius = 10
+                mass = 10
+                radius = 6
                 is_star = False
                 body_group.add(Body(pos, mass, velocity, acceleration, radius, dt, is_star, body_group))
                 mouse_held = False
